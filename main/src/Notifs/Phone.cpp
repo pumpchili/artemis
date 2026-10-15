@@ -117,6 +117,16 @@ void Phone::doMediaPrev(){
 	mediaCurrent->mediaPrev();
 }
 
+void Phone::doMediaVolUp(){
+	if(mediaCurrent == nullptr) return;
+	mediaCurrent->mediaVolUp();
+}
+
+void Phone::doMediaVolDown(){
+	if(mediaCurrent == nullptr) return;
+	mediaCurrent->mediaVolDown();
+}
+
 void Phone::onConnect(NotifSource* src){
 	current = src;
 	Events::post(Facility::Phone, Event { .action = Event::Connected, .data = { .phoneType = getPhoneType() } });

@@ -390,6 +390,18 @@ void Android::mediaPrev(){
 	uart.printf("mediaPrev\n");
 }
 
+// mediaVolUp -- requires companion app support for this command
+void Android::mediaVolUp(){
+	if(!connected) return;
+	uart.printf("mediaVolUp\n");
+}
+
+// mediaVolDown -- requires companion app support for this command
+void Android::mediaVolDown(){
+	if(!connected) return;
+	uart.printf("mediaVolDown\n");
+}
+
 std::vector<std::string> Android::splitProtocolMsg(const std::string& s, char delim){
 	std::vector<std::string> out;
 	out.reserve(static_cast<size_t>(std::count(s.begin(), s.end(), delim)) + 1);

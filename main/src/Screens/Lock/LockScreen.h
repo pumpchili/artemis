@@ -12,6 +12,7 @@
 #include "UIElements/ClockLabelBig.h"
 #include "LockSkin.h"
 #include "Filepaths.hpp"
+#include <optional>
 
 // TODO: functionality of this should be separated from UI and this should control UI, which can be different at times but needs same API for interacting with the user through different skins
 class LockScreen : public LVScreen {
@@ -60,6 +61,17 @@ private:
 	void loop() override;
 	void processEvt(const Phone::Event& evt);
 	void processInput(const Input::Data& evt);
+
+	// Media hold-to-adjust-volume: a short press of Up/Down skips tracks (on release),
+	// holding it steps the volume repeatedly until released.
+	void mediaHoldLoop();
+	void mediaVolStep(Input::Button btn);
+	std::optional<Input::Button> mediaHeldBtn;
+	uint64_t mediaHoldStart = 0;
+	uint64_t mediaLastVolStep = 0;
+	bool mediaHoldTriggered = false;
+	static constexpr uint64_t MediaHoldTime = 500; // [ms] hold before volume starts changing
+	static constexpr uint64_t MediaVolRepeat = 200; // [ms] between volume steps while held
 
 	void updateTime(const tm& time);
 	static constexpr uint32_t TimeUpdateInterval = 200;

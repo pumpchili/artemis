@@ -82,6 +82,8 @@ void LockScreen::loop(){
 		}
 	}
 
+	mediaHoldLoop();
+
 	if(millis() - lastTimeUpdate > TimeUpdateInterval){
 		updateTime(ts.getTime());
 	}
@@ -116,14 +118,24 @@ void LockScreen::processInput(const Input::Data& evt){
 				skin->getMedia()->deselect();
 			}else if(evt.btn == Input::Select){
 				skin->getMedia()->playPause();
-			}else if(evt.btn == Input::Up){
-				settings->get().screenRotate ? skin->getMedia()->next() : skin->getMedia()->prev();
-			}else if(evt.btn == Input::Down){
-				settings->get().screenRotate ? skin->getMedia()->prev() : skin->getMedia()->next();
+			}else if(evt.btn == Input::Up || evt.btn == Input::Down){
+				// Defer the skip to release so a hold can become a volume change instead
+				mediaHeldBtn = evt.btn;
+				mediaHoldStart = millis();
+				mediaHoldTriggered = false;
 			}
+		}else if(evt.action == Input::Data::Release && mediaHeldBtn && evt.btn == *mediaHeldBtn){
+			if(!mediaHoldTriggered){
+				// Short press: skip track (Up = prev, Down = next; swapped when screen is rotated)
+				const bool up = (evt.btn == Input::Up) != settings->get().screenRotate;
+				up ? skin->getMedia()->prev() : skin->getMedia()->next();
+			}
+			mediaHeldBtn.reset();
 		}
 		return;
 	}
+
+	mediaHeldBtn.reset();
 
 	if(evt.btn == Input::Alt && evt.action == Input::Data::Press && lv_group_get_focused(inputGroup) != skin->getMain()){
 		lv_group_focus_obj(skin->getMain());
@@ -143,6 +155,34 @@ void LockScreen::processInput(const Input::Data& evt){
 			}
 		}
 	}
+}
+
+void LockScreen::mediaHoldLoop(){
+	if(!mediaHeldBtn) return;
+
+	// Media control lost focus (or skin gone) while holding: abandon the hold
+	if(skin == nullptr || !skin->getMedia()->isActive()){
+		mediaHeldBtn.reset();
+		return;
+	}
+
+	const uint64_t now = millis();
+	if(!mediaHoldTriggered){
+		if(now - mediaHoldStart < MediaHoldTime) return;
+		mediaHoldTriggered = true;
+		mediaVolStep(*mediaHeldBtn);
+		mediaLastVolStep = now;
+	}else if(now - mediaLastVolStep >= MediaVolRepeat){
+		mediaVolStep(*mediaHeldBtn);
+		mediaLastVolStep = now;
+	}
+}
+
+void LockScreen::mediaVolStep(Input::Button btn){
+	// Volume follows the physical button direction, honoring screen rotation like track skipping
+	auto* settings = (Settings*) Services.get(Service::Settings);
+	const bool up = (btn == Input::Up) != settings->get().screenRotate;
+	up ? skin->getMedia()->volUp() : skin->getMedia()->volDown();
 }
 
 void LockScreen::processEvt(const Phone::Event& evt){

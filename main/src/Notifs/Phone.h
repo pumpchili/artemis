@@ -51,6 +51,8 @@ public:
 	void doMediaPause();
 	void doMediaNext();
 	void doMediaPrev();
+	void doMediaVolUp();
+	void doMediaVolDown();
 
 	const MediaInfo& getMedia() const;
 	MediaState getMediaState();

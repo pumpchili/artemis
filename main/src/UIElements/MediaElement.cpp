@@ -156,6 +156,14 @@ void MediaElement::next(){
 	timer([img](){ lv_img_set_src(img, "S:/media/next.bin"); });
 }
 
+void MediaElement::volUp(){
+	phone->doMediaVolUp();
+}
+
+void MediaElement::volDown(){
+	phone->doMediaVolDown();
+}
+
 void MediaElement::buildUI(){
 	auto settings = (Settings*) Services.get(Service::Settings);
 

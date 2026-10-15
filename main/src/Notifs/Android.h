@@ -29,6 +29,8 @@ public:
 	void mediaPause() override;
 	void mediaNext() override;
 	void mediaPrev() override;
+	void mediaVolUp() override;
+	void mediaVolDown() override;
 
 	void findPhoneStart();
 	void findPhoneStop();

@@ -60,6 +60,14 @@ void AMS::Client::mediaPrev(){
 	sendCommand(RemoteCommandID::PreviousTrack);
 }
 
+void AMS::Client::mediaVolUp(){
+	sendCommand(RemoteCommandID::VolumeUp);
+}
+
+void AMS::Client::mediaVolDown(){
+	sendCommand(RemoteCommandID::VolumeDown);
+}
+
 void AMS::Client::sendCommand(RemoteCommandID cmd){
 	if(!connected) return;
 	ESP_LOGI(TAG, "Sending remote command %d", cmd);

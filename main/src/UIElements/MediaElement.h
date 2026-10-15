@@ -21,6 +21,8 @@ public:
 	void playPause();
 	void prev();
 	void next();
+	void volUp();
+	void volDown();
 
 private:
 	void onSelect();

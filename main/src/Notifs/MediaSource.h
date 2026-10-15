@@ -24,6 +24,8 @@ public:
 	virtual void mediaPause() = 0;
 	virtual void mediaNext() = 0;
 	virtual void mediaPrev() = 0;
+	virtual void mediaVolUp() = 0;
+	virtual void mediaVolDown() = 0;
 
 protected:
 
